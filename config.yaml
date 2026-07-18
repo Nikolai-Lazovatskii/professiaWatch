@@ -1,0 +1,205 @@
+# profesia-watch configuration
+# Профиль настроен под резюме: Applied Informatics (FMFI UK), DevOps/MLOps,
+# Python/TypeScript, Docker, K8s, backend. Слова матчатся без учёта регистра
+# и диакритики (programátor == programator).
+
+regions:
+  - bratislavsky-kraj
+  - trnavsky-kraj
+
+job_types:
+  - internship-staz      # internship, stáž
+  - na-dohodu-brigady    # brigády
+  # - skrateny-uvazok    # раскомментируй, если нужен и skrátený úväzok
+
+count_days: 2        # окно поиска для ежедневных запусков (дубли отсеет state)
+first_run_days: 7    # окно для самого первого запуска
+max_pages: 5
+min_score: 2         # порог: 1 сильное слово (2 балла) или 2 слабых
+fetch_details: true  # заходить внутрь объявления и матчить полный текст
+request_delay: 0.8
+notify_empty: true   # присылать "ничего нового", чтобы видеть, что бот жив
+run_at: "08:00"      # время автопроверки в режиме бота (TZ Europe/Bratislava)
+
+keywords:
+  # 2 балла за каждое найденное
+  strong:
+    - python
+    - devops
+    - docker
+    - kubernetes
+    - k8s
+    - mlops
+    - machine learning
+    - strojové učenie
+    - umelá inteligencia
+    - artificial intelligence
+    - ai                # матч только целого слова: "AI/ML" да, "aim" нет
+    - linux
+    - backend
+    - back-end
+    - api
+    - rest api
+    - sql
+    - postgresql
+    - postgres
+    - databáza
+    - database
+    - git
+    - github
+    - gitlab
+    - ci/cd
+    - cicd
+    - fastapi
+    - node.js
+    - nodejs
+    - typescript
+    - javascript
+    - react
+    - react native
+    - php
+    - c++
+    - programátor
+    - programátorka
+    - developer
+    - vývojár
+    - vývojárka
+    - software engineer
+    - softvérový inžinier
+    - software development
+    - vývoj softvéru
+    - informatik
+    - informačné technológie
+    - it stážista
+    - it internship
+    - it trainee
+    - cloud
+    - aws
+    - azure
+    - gcp
+    - automatizácia
+    - automation
+    - data engineer
+    - data science
+    - data analyst
+    - dátový analytik
+    - tester
+    - testovanie
+    - qa
+    - quality assurance
+    - správca systémov
+    - správca siete
+    - system administrator
+    - sysadmin
+    - sieťový technik
+    - frontend
+    - front-end
+    - fullstack
+    - full-stack
+    - web developer
+    - telegram bot
+    - scripting
+    - skriptovanie
+    - it podpora
+    - it support
+    - it technik
+    - it oddelenie
+    - helpdesk
+    - help desk
+    - service desk
+
+  # 1 балл за каждое найденное
+  weak:
+    - technická podpora
+    - support specialist
+    - analyst
+    - softvér
+    - software
+    - hardvér
+    - hardware
+    - počítač
+    - web
+    - aplikácia
+    - app
+    - digitalizácia
+    - digital
+    - analytik
+    - dáta
+    - data
+    - erp
+    - sap
+    - windows
+    - troubleshooting
+    - active directory
+    - microsoft 365
+    - e-commerce
+    - online marketing
+    - sociálne siete
+    - social media
+    - monitoring
+    - server
+    - sieť
+    - network
+    - agile
+    - scrum
+    - stáž
+    - stáži
+    - stáže
+    - stážista
+    - stážistka
+    - prax
+    - praktikant
+    - trainee
+    - absolvent
+    - študent
+
+  # если слово есть в ЗАГОЛОВКЕ — объявление отбрасывается сразу
+  negative_title:
+    - vodič
+    - kuriér
+    - doručovateľ
+    - skladník
+    - skladníčka
+    - predavač
+    - predavačka
+    - pokladník
+    - pokladníčka
+    - čašník
+    - čašníčka
+    - kuchár
+    - kuchárka
+    - barman
+    - barista
+    - upratovač
+    - upratovačka
+    - chyžná
+    - opatrovateľ
+    - opatrovateľka
+    - sanitár
+    - murár
+    - zvárač
+    - lakovač
+    - stolár
+    - elektrikár
+    - inštalatér
+    - automechanik
+    - operátor výroby
+    - operátorka výroby
+    - výrobný operátor
+    - montážnik
+    - montážny pracovník
+    - strážnik
+    - sbs
+    - vrátnik
+    - hosteska
+    - promotér
+    - animátor
+    - plavčík
+    - záhradník
+    - pomocný pracovník
+    - pomocná sila
+    - brigáda vo výrobe
+    - zberač
+    - balenie tovaru
+    - vykladanie tovaru
+    - letná výpomoc na stanici

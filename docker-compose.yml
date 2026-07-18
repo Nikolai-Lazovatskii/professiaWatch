@@ -1,0 +1,11 @@
+services:
+  jobwatch:
+    build: .
+    container_name: profesia-watch
+    env_file: .env
+    environment:
+      - TZ=Europe/Bratislava
+    volumes:
+      - ./data:/app/data
+      - ./config.yaml:/app/config.yaml:ro
+    restart: unless-stopped
