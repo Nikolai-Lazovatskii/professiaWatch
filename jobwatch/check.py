@@ -68,11 +68,12 @@ def run_check(dry_run: bool = False, write_state: bool | None = None,
             time.sleep(delay)
             o.detail_text = profesia.fetch_detail_text(session, o)
             text = f"{text} {o.detail_text}"
-        o.score, o.matched = matcher.score(text)
-        is_match = matcher.is_match(o.score)
-        mark_seen(state, o.offer_id, o.score, is_match)
-        log(f"[{'MATCH' if is_match else 'no   '}] score={o.score:<3} {o.title[:60]}")
-        if is_match:
+        verdict = matcher.evaluate(o.title, text)
+        o.score, o.matched = verdict.score, verdict.matched
+        mark_seen(state, o.offer_id, o.score, verdict.is_match)
+        log(f"[{'MATCH' if verdict.is_match else 'no   '}] score={o.score:<3} "
+            f"strong={len(verdict.strong)} {o.title[:60]}")
+        if verdict.is_match:
             matches.append(o)
 
     matches.sort(key=lambda o: (-("stáž" in o.job_type or "internship" in o.job_type), -o.score))

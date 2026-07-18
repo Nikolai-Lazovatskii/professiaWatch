@@ -1,7 +1,11 @@
 # profesia-watch configuration
-# Профиль настроен под резюме: Applied Informatics (FMFI UK), DevOps/MLOps,
-# Python/TypeScript, Docker, K8s, backend. Слова матчатся без учёта регистра
-# и диакритики (programátor == programator).
+# Профиль под резюме: Applied Informatics (FMFI UK), DevOps/MLOps,
+# Python/TypeScript, Docker, K8s, backend.
+#
+# ПРАВИЛО МАТЧИНГА: вакансия проходит, только если в ней есть настоящий
+# IT-сигнал — минимум `min_strong` сильных слов в полном тексте, ЛИБО хотя бы
+# одно сильное слово прямо в заголовке. Слабые слова лишь добавляют баллы,
+# сами по себе матч не дают. Слова матчатся без учёта регистра и диакритики.
 
 regions:
   - bratislavsky-kraj
@@ -15,103 +19,139 @@ job_types:
 count_days: 2        # окно поиска для ежедневных запусков (дубли отсеет state)
 first_run_days: 7    # окно для самого первого запуска
 max_pages: 5
-min_score: 2         # порог: 1 сильное слово (2 балла) или 2 слабых
+min_score: 2         # минимальная сумма баллов (strong=2, weak=1)
+min_strong: 2        # сильных слов в тексте для матча (или 1 сильное в заголовке)
 fetch_details: true  # заходить внутрь объявления и матчить полный текст
 request_delay: 0.8
 notify_empty: true   # присылать "ничего нового", чтобы видеть, что бот жив
 run_at: "08:00"      # время автопроверки в режиме бота (TZ Europe/Bratislava)
 
 keywords:
-  # 2 балла за каждое найденное
+  # СИЛЬНЫЕ (2 балла) — только реальные IT-термины. Именно они решают, IT это или нет.
   strong:
-    - python
+    # роли
+    - programátor
+    - programátorka
+    - programovanie
+    - programming
+    - developer
+    - vývojár
+    - vývojárka
+    - vývoj softvéru
+    - software engineer
+    - software development
+    - softvérový inžinier
+    - data engineer
+    - data science
+    - data scientist
+    - dátový analytik
+    - dátový inžinier
+    - ml engineer
+    - tester
+    - testovanie
+    - qa
+    - quality assurance
     - devops
-    - docker
-    - kubernetes
-    - k8s
     - mlops
-    - machine learning
-    - strojové učenie
-    - umelá inteligencia
-    - artificial intelligence
-    - ai                # матч только целого слова: "AI/ML" да, "aim" нет
-    - linux
+    - sysadmin
+    - system administrator
+    - správca systémov
+    - správca siete
+    - sieťový technik
+    - it stážista
+    - it internship
+    - it trainee
+    - it podpora
+    - it support
+    - it technik
+    - it špecialista
+    - it specialist
+    - it administrátor
+    - it oddelenie
+    - helpdesk
+    - help desk
+    - service desk
+    - podpora používateľov
+    - user support
+    - informatik
+    - informatika
+    - informačné technológie
+    - výpočtová technika
+    - kybernetická bezpečnosť
+    - cybersecurity
+    - security engineer
+    - frontend
+    - front-end
     - backend
     - back-end
-    - api
-    - rest api
+    - fullstack
+    - full-stack
+    - web developer
+    - web development
+    # технологии
+    - python
+    - java
+    - c++
+    - c#
+    - .net
+    - php
+    - typescript
+    - javascript
+    - node.js
+    - nodejs
+    - react
+    - react native
+    - angular
+    - vue
+    - django
+    - flask
+    - fastapi
+    - html
+    - css
     - sql
     - postgresql
     - postgres
+    - mysql
     - databáza
     - database
+    - docker
+    - kubernetes
+    - k8s
+    - terraform
+    - ansible
+    - linux
+    - bash
+    - powershell
+    - windows server
+    - active directory
     - git
     - github
     - gitlab
     - ci/cd
     - cicd
-    - fastapi
-    - node.js
-    - nodejs
-    - typescript
-    - javascript
-    - react
-    - react native
-    - php
-    - c++
-    - programátor
-    - programátorka
-    - developer
-    - vývojár
-    - vývojárka
-    - software engineer
-    - softvérový inžinier
-    - software development
-    - vývoj softvéru
-    - informatik
-    - informačné technológie
-    - it stážista
-    - it internship
-    - it trainee
+    - rest api
+    - api
     - cloud
     - aws
     - azure
     - gcp
-    - automatizácia
-    - automation
-    - data engineer
-    - data science
-    - data analyst
-    - dátový analytik
-    - tester
-    - testovanie
-    - qa
-    - quality assurance
-    - správca systémov
-    - správca siete
-    - system administrator
-    - sysadmin
-    - sieťový technik
-    - frontend
-    - front-end
-    - fullstack
-    - full-stack
-    - web developer
+    - grafana
+    - prometheus
+    - zabbix
+    - selenium
+    - machine learning
+    - strojové učenie
+    - umelá inteligencia
+    - artificial intelligence
     - telegram bot
     - scripting
     - skriptovanie
-    - it podpora
-    - it support
-    - it technik
-    - it oddelenie
-    - helpdesk
-    - help desk
-    - service desk
 
-  # 1 балл за каждое найденное
+  # СЛАБЫЕ (1 балл) — только усиливают счёт, матч сами не дают
   weak:
     - technická podpora
     - support specialist
+    - analytik
     - analyst
     - softvér
     - software
@@ -121,37 +161,22 @@ keywords:
     - web
     - aplikácia
     - app
-    - digitalizácia
-    - digital
-    - analytik
-    - dáta
-    - data
-    - erp
-    - sap
-    - windows
-    - troubleshooting
-    - active directory
-    - microsoft 365
-    - e-commerce
-    - online marketing
-    - sociálne siete
-    - social media
-    - monitoring
     - server
     - sieť
     - network
+    - windows
+    - troubleshooting
+    - microsoft 365
+    - erp
+    - sap
+    - jira
     - agile
     - scrum
-    - stáž
-    - stáži
-    - stáže
-    - stážista
-    - stážistka
-    - prax
-    - praktikant
-    - trainee
-    - absolvent
-    - študent
+    - automatizácia
+    - automation
+    - ai
+    - e-commerce
+    - digitalizácia
 
   # если слово есть в ЗАГОЛОВКЕ — объявление отбрасывается сразу
   negative_title:
@@ -202,4 +227,19 @@ keywords:
     - zberač
     - balenie tovaru
     - vykladanie tovaru
-    - letná výpomoc na stanici
+    - účtovník
+    - účtovníčka
+    - fakturant
+    - fakturantka
+    - recepčný
+    - recepčná
+    - receptionist
+    - personalista
+    - personalistka
+    - hr intern
+    - hr stáž
+    - obchodný zástupca
+    - obchodná zástupkyňa
+    - realitný maklér
+    - account manager
+    - event manager

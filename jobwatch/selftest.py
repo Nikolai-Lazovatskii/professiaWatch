@@ -122,14 +122,22 @@ def main() -> None:
     cfg = load_config()
     m = Matcher(cfg)
     ok &= check("normalize diacritics", normalize("Vývojár PROGRAMÁTOR") == "vyvojar programator")
-    s, hits = m.score("DevOps stážista: Docker, Linux, CI/CD")
-    ok &= check(f"IT text scores >= 2 (got {s}: {hits})", s >= 2)
-    s2, _ = m.score("Predaj oblečenia v obchode")
-    ok &= check(f"non-IT text scores < 2 (got {s2})", s2 < 2)
+    v = m.evaluate("DevOps stážista", "DevOps stážista: Docker, Linux, CI/CD")
+    ok &= check(f"IT text matches (score {v.score}: {v.matched})", v.is_match)
+    v2 = m.evaluate("Predajca", "Predaj oblečenia v obchode")
+    ok &= check(f"non-IT text no match (score {v2.score})", not v2.is_match)
     ok &= check("negative title blocks", m.title_blocked("Predavač/ka v obchode") is not None)
     ok &= check("normal title not blocked", m.title_blocked("IT stážista") is None)
-    ok &= check("'ai' word boundary", m.score("AI/ML tím")[0] >= 2 and "aim high" not in
-               " ".join(m.score("aim high")[1]))
+    ok &= check("'ai' word boundary",
+                "ai" in m.evaluate("x", "AI/ML tím").matched
+                and not m.evaluate("x", "aim high").matched)
+    # generic internship fluff + one incidental strong word must NOT match
+    v3 = m.evaluate("Dlhodobá stáž pre podporu back office",
+                    "stáž back office, MS Office, github, AI nástroje, študent")
+    ok &= check(f"back-office stáž with fluff no match (score {v3.score})", not v3.is_match)
+    # terse but real IT title must match via title-strong route
+    v4 = m.evaluate("Stážista – programátor", "Stážista – programátor. Nástup ihneď.")
+    ok &= check(f"terse programátor title matches (score {v4.score})", v4.is_match)
 
     print("== 3. full pipeline (fixtures, dry run) ==")
     real_fetch = profesia.fetch_html
