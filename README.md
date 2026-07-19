@@ -1,66 +1,71 @@
 # profesia-watch
 
-Telegram-бот, который раз в день сканирует [profesia.sk](https://www.profesia.sk) и присылает новые **стажировки (internship/stáž)** и **бригады (na dohodu)** в Bratislavskom и Trnavskom kraji, подходящие под резюме (IT/DevOps/MLOps-профиль). Каждая вакансия — со ссылкой, зарплатой и списком совпавших ключевых слов.
+A Telegram bot that checks [Profesia.sk](https://www.profesia.sk) once per day for new internship and short-term job listings in the Bratislava and Trnava regions that match an IT, DevOps, or MLOps-oriented profile. Each alert includes a link, salary information, and the keywords that matched.
 
-## Как работает
+## How it works
 
-1. Тянет 4 фида: `{bratislavsky-kraj, trnavsky-kraj} × {internship-staz, na-dohodu-brigady}` за последние `count_days` дней.
-2. Отсекает уже виденное (`data/seen_offers.json`) и явный не-IT по заголовку (`negative_title`).
-3. Заходит в каждое новое объявление и матчит полный текст по ключевым словам (без учёта диакритики). Правило: вакансия проходит, только если есть настоящий IT-сигнал — минимум `min_strong: 2` сильных слова (python, tester, devops, IT support…) в тексте, либо одно сильное прямо в заголовке. Слабые слова (windows, analyst, sap…) лишь добавляют баллы — по ним одним «stáž в HR с упоминанием Excel» не пройдёт.
-4. Шлёт дайджест в Telegram.
+1. Pulls four feeds: `{bratislavsky-kraj, trnavsky-kraj} × {internship-staz, na-dohodu-brigady}` for the last `count_days` days.
+2. Filters out previously seen offers from `data/seen_offers.json` and obvious non-IT titles using `negative_title`.
+3. Opens each new listing and matches the full text against strong and weak keywords (diacritics are ignored). A posting is accepted only when it shows a real IT signal, such as at least `min_strong: 2` strong terms in the text or one strong term in the title.
+4. Sends a digest to Telegram.
 
-## Шаг 0: создать бота (1 минута)
+## Create a bot (about 1 minute)
 
-1. В Telegram открой [@BotFather](https://t.me/BotFather) → `/newbot` → имя → получишь **токен**.
-2. Напиши своему боту что-нибудь (это нужно, чтобы он мог тебе отвечать).
-3. `chat_id` узнаешь после запуска: бот на `/start` отвечает твоим chat_id. Либо сразу: `https://api.telegram.org/bot<ТОКЕН>/getUpdates` → `message.chat.id`.
+1. Open [@BotFather](https://t.me/BotFather) in Telegram and run `/newbot`.
+2. Choose a name for the bot and save the generated token.
+3. Start a conversation with the bot so it can reply to you.
+4. Retrieve your `chat_id` by running the bot once and using the `/start` response, or by calling `https://api.telegram.org/bot<token>/getUpdates`.
 
-## Вариант A: GitHub Actions (рекомендую — бесплатно, без сервера)
+## Deployment options
 
-1. Создай **приватный** репозиторий, залей туда содержимое этой папки.
-2. Repo → Settings → Secrets and variables → Actions → добавь `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`.
-3. Actions → `daily-job-check` → **Run workflow** (первый запуск, окно 7 дней).
+### Option A: GitHub Actions
 
-Дальше сам запускается каждый день в 08:00 (cron в `.github/workflows/daily.yml`). Состояние коммитится обратно в репозиторий. В этом варианте работает только ежедневный дайджест, без команды `/check` в чате.
+1. Create a private repository and upload the contents of this folder.
+2. Go to the repository settings, open Secrets and variables → Actions, and add `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
+3. Open the Actions tab and run `daily-job-check` once to create the initial state.
 
-## Вариант B: VPS / Docker (полноценный бот с /check)
+The workflow runs daily at 08:00 according to the schedule in `.github/workflows/daily.yml`. In this setup, the bot sends a daily digest only; the chat `/check` command is not available.
+
+### Option B: VPS / Docker
 
 ```bash
-cp .env.example .env   # вписать токен; chat_id можно после первого /start
+cp .env.example .env   # add the token; chat_id can be filled after the first /start
 docker compose up -d --build
 docker compose logs -f
 ```
 
-Бот отвечает на `/check` (проверить сейчас), `/status`, `/start` и сам запускает проверку ежедневно в `run_at` (08:00, Europe/Bratislava).
+This setup provides a full bot experience with `/check`, `/status`, and `/start`, and it can run daily checks at the configured `run_at` time (08:00, Europe/Bratislava).
 
-## Вариант C: локально
+### Option C: Local execution
 
 ```bash
 pip install -r requirements.txt
 export TELEGRAM_BOT_TOKEN=... TELEGRAM_CHAT_ID=...
-python -m jobwatch.check            # одна проверка + отправка
-python -m jobwatch.check --dry-run  # без отправки, вывод в консоль
+python -m jobwatch.check            # run one check and send notifications
+python -m jobwatch.check --dry-run  # print results without sending anything
 ```
 
-## Настройка под себя — `config.yaml`
+## Configuration
 
-- `keywords.strong / weak` — добавляй/убирай технологии; матч по целым словам, диакритика не важна.
-- `negative_title` — заголовки-стоп-слова (vodič, skladník, …).
-- `min_strong` — главный регулятор строгости: 2 = нужно два IT-термина в тексте (или один в заголовке); подними до 3, если шумно.
-- `min_score` — дополнительный порог по сумме баллов.
-- `job_types` — можно раскомментировать `skrateny-uvazok`.
-- `notify_empty: false` — не присылать «ничего нового».
+The main settings live in `config.yaml`:
 
-## Проверка и отладка
+- `keywords.strong` / `keywords.weak` — add or remove technologies; matching is based on whole words, and diacritics are ignored.
+- `negative_title` — stop words for titles such as `vodič` or `skladník`.
+- `min_strong` — the main strictness setting. A value of `2` means the bot expects two strong IT terms in the text or one strong term in the title.
+- `min_score` — an additional threshold based on the total score.
+- `job_types` — uncomment `skrateny-uvazok` if needed.
+- `notify_empty: false` — suppress notifications when there are no new offers.
+
+## Validation and debugging
 
 ```bash
-python -m jobwatch.selftest      # оффлайн-тест парсера и матчинга (20 проверок)
-python -m jobwatch.debug_parse   # живой тест парсера на реальной странице
+python -m jobwatch.selftest      # offline parser and matcher test (20 checks)
+python -m jobwatch.debug_parse   # live parser test against a real page
 ```
 
-Если `debug_parse` покажет `0 offers parsed` — разметка сайта изменилась; пришли вывод Claude, поправим селекторы.
+If `debug_parse` reports `0 offers parsed`, the site markup may have changed and the selectors should be updated.
 
-## Ограничения
+## Notes and limitations
 
-- Это скрапинг публичных страниц: интервал запросов ~1 с, 1 запуск в день — нагрузка минимальная. Не запускай чаще нескольких раз в день.
-- Отклик на вакансию — вручную по ссылке (автоотклик profesia.sk без логина не даёт, и это к лучшему).
+- This project scrapes public pages. The request interval is roughly 1 second, and running it more than once per day is not recommended.
+- Applications should be submitted manually through the job link. Automated applications via Profesia without a login are not supported.
