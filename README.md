@@ -56,6 +56,36 @@ The main settings live in `config.yaml`:
 - `job_types` — uncomment `skrateny-uvazok` if needed.
 - `notify_empty: false` — suppress notifications when there are no new offers.
 
+### How to change the job filters
+
+You can tune which jobs are sent by editing `config.yaml`:
+
+1. Update `keywords.strong` with the technologies you want to prioritize, for example `python`, `devops`, `mlops`, or `aws`.
+2. Update `keywords.weak` with broader terms that should only act as a secondary signal.
+3. Add terms to `negative_title` if you want to exclude specific titles such as `manager`, `support`, or `sales`.
+4. Increase `min_strong` if you want fewer matches and a stricter filter.
+5. Lower `min_strong` or `min_score` if you want more opportunities to be included.
+
+A simple workflow is:
+
+```yaml
+keywords:
+  strong:
+    - python
+    - devops
+    - aws
+  weak:
+    - support
+    - analyst
+min_strong: 2
+min_score: 3
+negative_title:
+  - manager
+  - sales
+```
+
+After changing the file, run the bot again to see the updated results.
+
 ## Validation and debugging
 
 ```bash
