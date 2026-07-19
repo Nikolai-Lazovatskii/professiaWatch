@@ -58,15 +58,16 @@ The main settings live in `config.yaml`:
 
 ### How to change the job filters
 
-You can tune which jobs are sent by editing `config.yaml`:
+You can tune which jobs are sent by editing `config.yaml`. The filtering logic is split into a few simple layers, and each one affects the final result in a different way.
 
-1. Update `keywords.strong` with the technologies you want to prioritize, for example `python`, `devops`, `mlops`, or `aws`.
-2. Update `keywords.weak` with broader terms that should only act as a secondary signal.
-3. Add terms to `negative_title` if you want to exclude specific titles such as `manager`, `support`, or `sales`.
-4. Increase `min_strong` if you want fewer matches and a stricter filter.
-5. Lower `min_strong` or `min_score` if you want more opportunities to be included.
+1. `keywords.strong` is the main signal. Add the technologies or roles that should strongly match your profile, such as `python`, `devops`, `mlops`, `aws`, `kubernetes`, or `data engineer`.
+2. `keywords.weak` is a softer signal. These words should not be the only reason a job is accepted, but they can help when a listing is otherwise relevant.
+3. `negative_title` removes jobs whose title looks unrelated to your target profile. Add words like `manager`, `support`, `sales`, `hr`, or `accounting` if those titles appear too often.
+4. `min_strong` controls strictness. A higher value means fewer matches and a more selective filter. If you want broader coverage, lower it.
+5. `min_score` adds another checkpoint based on the total score. Use it if you want a job to pass only when it has enough overall evidence, not just one strong keyword.
+6. `job_types` lets you include or exclude specific offer types. If you only want internships and regular contracts, keep the list focused. If you want to try other types, uncomment the relevant entries.
 
-A simple workflow is:
+A practical example for a Python/DevOps-oriented profile is:
 
 ```yaml
 keywords:
@@ -74,15 +75,24 @@ keywords:
     - python
     - devops
     - aws
+    - kubernetes
+    - docker
   weak:
     - support
     - analyst
+    - linux
 min_strong: 2
 min_score: 3
 negative_title:
   - manager
   - sales
+  - hr
+job_types:
+  - internship-staz
+  - na-dohodu-brigady
 ```
+
+If the bot sends too many irrelevant jobs, increase `min_strong`, add more words to `negative_title`, or remove weak keywords. If it sends too few jobs, lower `min_strong`, add more strong terms, or reduce the number of exclusions.
 
 After changing the file, run the bot again to see the updated results.
 
